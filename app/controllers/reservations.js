@@ -6,7 +6,7 @@ class Reservations {
     let endDate = new Date(startDate.getTime())
     endDate = new Date(endDate.setMinutes(endDate.getMinutes() + req.body.reservation.duration * 60))
 
-    const item = { guests: req.body.reservation.guests, start: startDate, end: endDate, table_id: knex('tables').where('capasity', '>=', req.body.reservation.guests).first() }
+    const item = { guests: req.body.reservation.guests, start: startDate, end: endDate, table_id: knex('tables').where('capacity', '>=', req.body.reservation.guests).first() }
     try {
       reservationId = await knex('reservations').returning('id').insert(item)
     } catch (err) {
@@ -42,7 +42,7 @@ class Reservations {
           start: startDate,
           end: endDate,
           guests: req.body.reservation.guests,
-          table_id: knex('tables').where('capasity', '>=', req.body.reservation.guests).first()
+          table_id: knex('tables').where('capacity', '>=', req.body.reservation.guests).first()
         })
     } catch (err) {
       return res.sendStatus(409)
