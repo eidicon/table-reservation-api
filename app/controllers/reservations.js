@@ -8,7 +8,7 @@ class Reservations {
 
     const item = { guests: req.body.reservation.guests, start: startDate, end: endDate, table_id: knex('tables').where('capasity', '>=', req.body.reservation.guests).first() }
     try {
-      reservationId = await knex('reservations').returning('id').insert(item).where()
+      reservationId = await knex('reservations').returning('id').insert(item)
     } catch (err) {
       return res.sendStatus(404)
     }
@@ -28,19 +28,26 @@ class Reservations {
   }
 
   static async updateReservation (req, res) {
+    let reservationId
     const startDate = new Date(req.body.reservation.time)
     let endDate = new Date(startDate.getTime())
     endDate = new Date(endDate.setMinutes(endDate.getMinutes() + req.body.reservation.duration * 60))
     try {
-      await knex('reservations')
+      reservationId = await knex('reservations')
+        .returning('id')
         .where('end', '<', startDate)
         .orWhere('start', '>', endDate)
         .andWhere({ id: req.params.reservation_id })
-        .select()
+        .update({
+          start: startDate,
+          end: endDate,
+          guests: req.body.reservation.guests,
+          table_id: knex('tables').where('capasity', '>=', req.body.reservation.guests).first()
+        })
     } catch (err) {
       return res.sendStatus(409)
     }
-    res.sendStatus(200)
+    res.status(201).header('Location', `/api/reservations/${reservationId}`).send()
   }
 
   static async deleteReservation (req, res) {
