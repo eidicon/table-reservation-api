@@ -1,4 +1,7 @@
 const knex = require('../../db')
+const axios = require('axios')
+const logger = require('../utils/logger')
+
 class Reservations {
   static async createReservation (req, res) {
     let reservationId
@@ -10,6 +13,7 @@ class Reservations {
     try {
       reservationId = await knex('reservations').returning('id').insert(item)
     } catch (err) {
+      logger.error(err)
       return res.sendStatus(404)
     }
     res.status(201).header('Location', `/api/reservations/${reservationId}`).send()
@@ -22,6 +26,10 @@ class Reservations {
         .where({ id: req.params.reservation_id })
         .first()
     } catch (err) {
+      logger.error(err)
+      return res.sendStatus(404)
+    }
+    if (reservation.length > 0) {
       return res.sendStatus(404)
     }
     return res.status(200).json({ 'reservation': reservation })
@@ -45,9 +53,32 @@ class Reservations {
           table_id: knex('tables').where('capacity', '>=', req.body.reservation.guests).first()
         })
     } catch (err) {
+      logger.error(err)
       return res.sendStatus(409)
     }
     res.status(201).header('Location', `/api/reservations/${reservationId}`).send()
+  }
+
+  static async addOrderToReservation (req, res) {
+    const body = req.body
+    const response = await axios.post('/api/orders', { body })
+    const status = await response.status
+    if (status !== 201) {
+      return res.sendStatus(404)
+    }
+    const headers = await response.headers()
+    const header = await headers[Object.getOwnPropertySymbols(headers)[0]]
+    const link = await header['Location']
+    if (link.length < 0) {
+      return res.sendStatus(404)
+    }
+    try {
+      await knex('reservations').where({ id: req.params.reservation_id }).upadte({ orderUri: link })
+    } catch (err) {
+      logger.error(err)
+      return res.sendStatus(404)
+    }
+    res.sendStatus(201)
   }
 
   static async deleteReservation (req, res) {
@@ -56,6 +87,7 @@ class Reservations {
         .where({ id: req.params.reservation_id })
         .del()
     } catch (err) {
+      logger.error(err)
       return res.sendStatus(400)
     }
     return res.sendStatus(204)
