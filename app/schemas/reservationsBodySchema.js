@@ -1,6 +1,6 @@
 const Joi = require('joi')
 
-const bodySchema = Joi.object().keys({
+const reservationsBodySchema = Joi.object().keys({
   reservation: Joi.object().keys({
     guests: Joi.number().integer().positive().min(1).max(10).required(),
     time: Joi.date().iso().greater('now'),
@@ -8,4 +8,4 @@ const bodySchema = Joi.object().keys({
   }).required()
 })
 
-module.exports = bodySchema
+module.exports = reservationsBodySchema
