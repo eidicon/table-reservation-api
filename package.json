@@ -6,12 +6,14 @@
   "scripts": {
     "unit-tests": "node ./node_modules/mocha/bin/mocha  tests/unit",
     "integration-tests": "node ./node_modules/mocha/bin/mocha --exit --timeout=20000 tests/integration",
-    "server": "node index.js"
+    "server": "node index.js",
+    "notification-consumer": "node ./app/notification/consumer.js"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "amqplib": "^0.5.2",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "chai": "^4.1.2",

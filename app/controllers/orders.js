@@ -24,7 +24,7 @@ class Orders {
       logger.error(err)
       return res.sendStatus(404)
     }
-    if (order.length > 0) {
+    if (order.length <= 0) {
       return res.sendStatus(404)
     }
     return res.status(200).json({ 'order': order })
