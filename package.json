@@ -6,12 +6,15 @@
   "scripts": {
     "unit-tests": "node ./node_modules/mocha/bin/mocha  tests/unit",
     "integration-tests": "node ./node_modules/mocha/bin/mocha --exit --timeout=20000 tests/integration",
-    "server": "node index.js"
+    "server": "node index.js",
+    "reservations-consumer": "node ./app/notifications/bin/reservations_consumer.js",
+    "notifications-consumer": "node ./app/notifications/bin/notifications_consumer.js"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "amqplib": "^0.5.2",
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "chai": "^4.1.2",
@@ -21,6 +24,7 @@
     "joi": "^13.6.0",
     "knex": "^0.15.2",
     "mocha": "^5.2.0",
+    "nodemailer": "^4.6.8",
     "pg": "^7.4.3",
     "sinon": "^6.3.4",
     "supertest": "^3.3.0",

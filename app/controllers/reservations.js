@@ -1,9 +1,18 @@
 const knex = require('../../db')
 const axios = require('axios')
 const logger = require('../utils/logger')
+const producer = require('../notifications/producer')
 
 class Reservations {
   static async createReservation (req, res) {
+    try {
+      producer.publish(req.body)
+    } catch (err) {
+      logger.error(err)
+      return res.status(500).send(`Reservation service temporarry unavailable`)
+    }
+    res.status(200).send(`OK`)
+
     let reservationId
     const startDate = new Date(req.body.reservation.time)
     let endDate = new Date(startDate.getTime())
@@ -29,7 +38,7 @@ class Reservations {
       logger.error(err)
       return res.sendStatus(404)
     }
-    if (reservation.length > 0) {
+    if (reservation.length <= 0) {
       return res.sendStatus(404)
     }
     return res.status(200).json({ 'reservation': reservation })
@@ -69,7 +78,7 @@ class Reservations {
     const headers = await response.headers()
     const header = await headers[Object.getOwnPropertySymbols(headers)[0]]
     const link = await header['Location']
-    if (link.length < 0) {
+    if (link.length <= 0) {
       return res.sendStatus(404)
     }
     try {

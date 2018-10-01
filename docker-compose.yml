@@ -35,6 +35,58 @@ services:
         max-file: "1" 
     ports:
       - "5432:5432"
+  rabbitmq:
+    image: rabbitmq:3.7-management-alpine
+    restart: unless-stopped
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    env_file:
+      - .env
+    networks:
+      - backend
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+  reservation_consumer:
+    image: node:8.12-alpine
+    restart: unless-stopped
+    networks:
+      - backend
+    working_dir: /usr/src/app
+    depends_on: 
+      - postgres
+      - rabbitmq
+    volumes:
+      - type: bind
+        source: './'
+        target: /usr/src/app
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1" 
+    command: ["yarn", "run", "reservations-consumer"]
+  notification_consumer:
+    image: node:8.12-alpine
+    restart: unless-stopped
+    networks:
+      - backend
+    working_dir: /usr/src/app
+    depends_on: 
+      - rabbitmq
+    volumes:
+      - type: bind
+        source: './'
+        target: /usr/src/app
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1" 
+    command: ["yarn", "run", "notifications-consumer"]
 networks:
   frontend:
     driver: bridge
