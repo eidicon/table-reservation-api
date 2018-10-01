@@ -6,10 +6,12 @@ const producer = require('../notifications/producer')
 class Reservations {
   static async createReservation (req, res) {
     try {
-      producer.publish()
+      producer.publish(req.body)
     } catch (err) {
-
+      logger.error(err)
+      return res.status(500).send(`Reservation service temporarry unavailable`)
     }
+    res.status(200).send(`OK`)
 
     let reservationId
     const startDate = new Date(req.body.reservation.time)

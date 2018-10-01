@@ -1,5 +1,5 @@
-export const EXCHANGE_NAME = 'notifications'
+export const EXCHANGE_NAME = 'reservations'
 export const EXCHANGE_TYPE = 'direct'
 export const EXCHANGE_OPTION = { durable: true }
-export const NOTIFICATIONS_RK = 'notifications'
+export const RESERVATIONS_RK = 'reservations'
 export const QUEUE_OPTIONS = { persistent: true }
